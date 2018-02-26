@@ -5,10 +5,10 @@ class Genetic:
 
 
     def __init__(self, file):
-        size, A, B = self.read_data_from_file(file)
+        size, D, F = self.read_data_from_file(file)
         self.size = size
-        self.A = A
-        self.B = B
+        self.D = D # distances
+        self.F = F # flows
 
 
     # file structure to load
@@ -41,7 +41,9 @@ class Genetic:
         cost = 0.0
         for i in range(len(permData)):
             for j in range(len(permData)):
-                cost = cost + self.A[i][j] * self.B[permData[i]-1][permData[j]-1]
+                distance = self.D[i][j]
+                flow = self.F[permData[i]-1][permData[j]-1]
+                cost = cost + distance * flow
         return cost
 
 
