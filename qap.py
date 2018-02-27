@@ -1,7 +1,6 @@
-import random
-import numpy as np
 import utils as utils
 import data as data
+import random
 
 class QAP:
 
@@ -29,31 +28,45 @@ class QAP:
         return best_cost, best_permutation
 
     def greedy_algorithm(self):
-        cost = 0.0
-        minimum_cost = float("inf")
-        start = 0
-        second = 0
-        cost = 0.0
-        for i in range(self.size):
-            for j in range(self.size):
-                distance = self.D[i][j]
-                flow = self.F[permData[i] - 1][permData[j] - 1]
-                cost += distance * flow
-        for i in range(self.size):
-            for j in range(self.size):
-                distance = self.D[i][j]
-                if minimum_distance > distance:
-                    minimum_distance = distance
-                    a = i
-                    b = j
-        for i in range(self.size):
-           for j in range(self.size):
-                flow = self.F[a - 1][b - 1]
-                if flow > maximum_flow:
-                    maximum_flow = flow
+        next = 0
+        localizations = set(range(0, self.size))
+        solution = list([])
 
-        #cost += distance * flow
-        return cost,
+        #find start point: the shortest path with the biggest flow for all matrix
+
+        # for i in range(self.size):
+        #     for j in range(self.size):
+        #         distance = self.D[i][j]
+        #         flow = self.F[i][j]
+        #         if (distance != 0 and flow != 0):
+        #             factor = distance / flow
+        #             if minimum_factor > factor:
+        #                 minimum_factor = factor
+        #                 current = i
+        #                 next = j
+        #
+        # localizations.remove(current)
+        # solution.append(current)
+        # current = next
+
+        current = random.randint(0, self.size)
+        while localizations != set([]):
+            factor_next = float("inf")
+            for l in localizations:
+                distance = self.D[current][l]
+                flow = self.F[current][l]
+                if (distance != 0 and flow != 0):
+                    factor = distance / flow
+                    if factor < factor_next:
+                        factor_next = factor
+                        next = l
+            localizations.remove(current)
+            solution.append(current)
+            current = next
+
+        cost = utils.count_current_permutation_cost(self.D, self.F, solution)
+
+        return cost, solution
 
 
 # count sample cos for 12 x 12
@@ -65,6 +78,7 @@ print(utils.count_current_permutation_cost(had12.D, had12.F, permHad12), ",", pe
 print("Random Search: ")
 print(had12.random_search(1000))
 print("Greedy Algorithm: ")
+print(had12.greedy_algorithm())
 
 
 # count sample for 14 x 14
