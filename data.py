@@ -10,12 +10,12 @@ def read_data_from_file(file):
     # second matrix B
 
     with open(file, mode='r', encoding='utf-8') as data:
-        size = int(data.readline())
+        size = int(data.readline()) #matrix size - amount of localizations
         data.readline()
-        A = load_data_to_matrix(data, size)
+        D = load_data_to_matrix(data, size) # distances
         data.readline()
-        B = load_data_to_matrix(data, size)
-    return (size, A, B)
+        F = load_data_to_matrix(data, size) #flows
+    return (size, D, F)
 
 
 def load_data_to_matrix(f, size):

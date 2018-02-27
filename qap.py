@@ -30,7 +30,8 @@ class QAP:
     def greedy_algorithm(self):
         next = 0
         localizations = set(range(0, self.size))
-        solution = list([])
+        best_cost = float("inf")
+        best_permutation = list([])
 
         #find start point: the shortest path with the biggest flow for all matrix
 
@@ -49,24 +50,38 @@ class QAP:
         # solution.append(current)
         # current = next
 
-        current = random.randint(0, self.size)
-        while localizations != set([]):
-            factor_next = float("inf")
-            for l in localizations:
-                distance = self.D[current][l]
-                flow = self.F[current][l]
-                if (distance != 0 and flow != 0):
-                    factor = distance / flow
-                    if factor < factor_next:
-                        factor_next = factor
-                        next = l
-            localizations.remove(current)
-            solution.append(current)
-            current = next
 
-        cost = utils.count_current_permutation_cost(self.D, self.F, solution)
+        for a in localizations:
 
-        return cost, solution
+            permutation = list([])
+            current = a
+            localizations_to_visit = set(range(0, self.size))
+
+            while localizations_to_visit != set([]):
+
+                factor_next = float("inf")
+
+                for l in localizations_to_visit:
+                    distance = self.D[current][l]
+                    flow = self.F[current][l]
+                    if (distance != 0 and flow != 0):
+                        factor = utils.count_current_permutation_cost(self.D, self.F, (current, l))
+                        if factor < factor_next:
+                            factor_next = factor
+                            next = l
+
+                localizations_to_visit.remove(current)
+                permutation.append(current)
+                current = next
+
+            cost = utils.count_current_permutation_cost(self.D, self.F, permutation)
+
+            if (cost < best_cost):
+                best_cost = cost
+                best_permutation = permutation
+
+
+        return best_cost, best_permutation
 
 
 # count sample cos for 12 x 12
@@ -90,6 +105,7 @@ print(utils.count_current_permutation_cost(had14.D, had14.F, permHad14), ",", pe
 print("Random Search: ")
 print(had14.random_search(2000))
 print("Greedy Algorithm: ")
+print(had14.greedy_algorithm())
 
 # count sample for 16 x 16
 print("\n16 x 16")
@@ -100,6 +116,7 @@ print(utils.count_current_permutation_cost(had16.D, had16.F, permHad16), ",", pe
 print("Random Search: ")
 print(had16.random_search(3000))
 print("Greedy Algorithm: ")
+print(had16.greedy_algorithm())
 
 # count sample for 18 x 18
 print("\n18 x 18")
@@ -110,6 +127,7 @@ print(utils.count_current_permutation_cost(had18.D, had18.F, permHad18), ",", pe
 print("Random Search: ")
 print(had18.random_search(4000))
 print("Greedy Algorithm: ")
+print(had18.greedy_algorithm())
 
 # count sample for 20 x 20
 print("\n20 x 20")
@@ -120,3 +138,4 @@ print(utils.count_current_permutation_cost(had20.D, had20.F, permHad20), ",", pe
 print("Random Search: ")
 print(had20.random_search(5000))
 print("Greedy Algorithm: ")
+print(had20.greedy_algorithm())
