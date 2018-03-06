@@ -131,31 +131,31 @@ class Population:
                 s.Specimen(self.input_data, offspring_2)]
 
     def crossover_PMX(self, mother, father):
-            if len(mother.permutation) != len(father.permutation):
-                raise ValueError("Cannot crossover two subjects with different perm size")
-            cut_points = sorted(random.sample(range(1, len(mother.permutation)), 2))
+        if len(mother.permutation) != len(father.permutation):
+            raise ValueError("Cannot crossover two subjects with different perm size")
+        cut_points = sorted(random.sample(range(1, len(mother.permutation)), 2))
 
-            offspring_1, offspring_2 = s.Specimen(self.input_data, mother.permutation), s.Specimen(self.input_data, father.permutation)
+        offspring_1, offspring_2 = s.Specimen(self.input_data, mother.permutation), s.Specimen(self.input_data, father.permutation)
 
-            for localisation in range(cut_points[0], cut_points[1]):
-                offspring_2.permutation[localisation] = mother.permutation[localisation]
-                offspring_1.permutation[localisation] = father.permutation[localisation]
+        for localisation in range(cut_points[0], cut_points[1]):
+            offspring_2.permutation[localisation] = mother.permutation[localisation]
+            offspring_1.permutation[localisation] = father.permutation[localisation]
 
-            mapping = dict()
-            for i in [x for x in range(len(mother.permutation)) if x not in range(cut_points[0], cut_points[1])]:
-                mapping[i] = [mother.permutation[i], father.permutation[i]]
+        mapping = dict()
+        for i in [x for x in range(len(mother.permutation)) if x not in range(cut_points[0], cut_points[1])]:
+            mapping[i] = [mother.permutation[i], father.permutation[i]]
 
-            for i in mapping:
-                if mother.permutation[i] not in offspring_1.permutation:
-                    offspring_1.permutation[i] = mapping[i][0]
-                else:
-                    offspring_1.permutation[i] = mapping[i][1]
-                if mother.permutation[i] not in offspring_2.permutation:
-                    offspring_2.permutation[i] = mapping[i][0]
-                else:
-                    offspring_2.permutation[i] = mapping[i][1]
+        for i in mapping:
+            if mother.permutation[i] not in offspring_1.permutation:
+                offspring_1.permutation[i] = mapping[i][0]
+            else:
+                offspring_1.permutation[i] = mapping[i][1]
+            if mother.permutation[i] not in offspring_2.permutation:
+                offspring_2.permutation[i] = mapping[i][0]
+            else:
+                offspring_2.permutation[i] = mapping[i][1]
 
-            return offspring_1, offspring_2
+        return offspring_1, offspring_2
 
     def fix_locations(self, locations):
         number_of_occurrences = np.bincount(locations, minlength=self.input_data.size)
@@ -172,24 +172,3 @@ class Population:
             self.population[i] = self.population[i].mutation(self.mutation_probability)
             self.cost_count += 1
 
-
-had12 = qap.QAP("had12.dat")
-population = Population(had12, 20, 0.1, 0.05)
-print(population.create_population())
-print(population.evaluate(0))
-
-permHad12_1 = [int(x) for x in "5,10,11,2,12,3,6,7,8,1,4,9".split(",")]
-permHad12_2 = [int(x) for x in "7,10,12,2,6,3,0,4,8,1,5,11".split(",")]
-child_1, child_2 = population.crossover_specimens(s.Specimen(population.input_data, permHad12_1),
-                                     s.Specimen(population.input_data, permHad12_2))
-print(child_1.permutation, child_1.cost)
-print(child_2.permutation, child_2.cost)
-
-child_3, child_4 = population.crossover_PMX(s.Specimen(population.input_data, permHad12_1),
-                                     s.Specimen(population.input_data, permHad12_2))
-
-
-print(child_3.permutation, child_3.cost)
-print(child_4.permutation, child_4.cost)
-
-population.selection_by_roulette("0")
