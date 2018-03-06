@@ -1,5 +1,5 @@
 import utils
-import numpy as np
+import random
 
 class Specimen:
 
@@ -11,11 +11,11 @@ class Specimen:
     def __str__(self):
         return self.permutation, self.cost
 
-    #factor is selection provability
+    #factor is selection probability
     def mutation(self, factor):
-        random_indexes = np.random.choice(range(self.input_data.size),
-                                              int(factor * self.input_data.size / 2) * 2, replace=False)
+        random_indexes = random.sample(range(1, len(self.permutation)), 2)
         mutated_locations = self.permutation.copy()
-        mutated_locations[random_indexes] = mutated_locations[random_indexes[::-1]]
-
+        swap = mutated_locations[random_indexes[0]]
+        mutated_locations[random_indexes[0]] = mutated_locations[random_indexes[1]]
+        mutated_locations[random_indexes[1]] = swap
         return Specimen(self.input_data, mutated_locations)

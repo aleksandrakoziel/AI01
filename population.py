@@ -38,7 +38,7 @@ class Population:
     # minimum cost,
     # maximum cost
     # and average cost
-    def evaluate(self, iteration=None):
+    def evaluate(self, generation=None):
         population_of_generation = self.population
         sum_costs = sum(specimen.cost for specimen in population_of_generation)
         average_cost = sum_costs / len(population_of_generation)
@@ -51,25 +51,34 @@ class Population:
 
         if self.best_specimen is None or self.best_specimen.cost > current_population_parameters["Minimum_cost"].cost:
             self.best_specimen = current_population_parameters["Minimum_cost"]
-        if iteration is not None:
-            self.history[iteration] = current_population_parameters
+        if generation is not None:
+            self.history[generation] = current_population_parameters
 
         return current_population_parameters
 
-    def selection_by_tournament(self):
+    def selection_by_tournament(self, tour_size):
         pass
 
     def selection_by_roulette(self, previous_generation):
 
-        current_population = self.history["previous_generation"]
+        current_population = self.population
+        max_cost = max(current_population, key=lambda specimen: specimen.cost)
+        total_cost = sum(specimen.cost for specimen in current_population)
+
         probability_distribution = []
         for specimen in self.population:
-            probability_distribution.append((current_population["Maximum_cost"].cost - (specimen.cost + 1))
-                                            /(current_population["Total_cost"] + 1))
+            probability_distribution.append((max_cost.cost - specimen.cost)/(total_cost))
 
-        to_crossover = random.choices(current_population,
-                                      probability_distribution,
-                                      k=int(self.population_size * self.crossover_probability))
+
+        summarize_probability = sum(probability_distribution)
+        probability_distribution[-1] = probability_distribution[-1] + 1 - summarize_probability
+
+        to_crossover = np.random.choice(current_population,
+                                        int(self.population_size * self.crossover_probability),
+                                        replace=False,
+                                        p=probability_distribution)
+        for x in to_crossover:
+            print(x.permutation)
 
         if len(to_crossover) % 2 != 0:
             if len(to_crossover) > 2:
@@ -167,7 +176,7 @@ class Population:
 had12 = qap.QAP("had12.dat")
 population = Population(had12, 20, 0.1, 0.05)
 print(population.create_population())
-print(population.evaluate())
+print(population.evaluate(0))
 
 permHad12_1 = [int(x) for x in "5,10,11,2,12,3,6,7,8,1,4,9".split(",")]
 permHad12_2 = [int(x) for x in "7,10,12,2,6,3,0,4,8,1,5,11".split(",")]
@@ -182,3 +191,5 @@ child_3, child_4 =population.crossover_PMX(s.Specimen(population.input_data, per
 
 print(child_3.permutation, child_3.cost)
 print(child_4.permutation, child_4.cost)
+
+population.selection_by_roulette("0")
