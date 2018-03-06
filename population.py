@@ -86,34 +86,68 @@ class Population:
 
         ranking = sorted(current, key=lambda specimen: specimen.cost)
         count_specimens = int(self.population_size * self.crossover_probability)
+
         if count_specimens % 2 != 0:
             if count_specimens > 2:
                 count_specimens = count_specimens - 1
             else:
                 raise ValueError("Cannot cross one specimen!")
 
-        specimen_to_crossover = [specimen[1] for specimen in ranking[:count_specimens]]
+        specimen_to_crossover = [specimen for specimen in ranking[:count_specimens]]
         return specimen_to_crossover
 
 
     def crossover(self, selected_to_cross):
-            for i in zip(*[iter(selected_to_cross)] * 2):
-                self.population[i[0]], self.population[i[1]] = self.crossover_specimens(self.population[i[0]],
-                                                                                        self.population[i[1]])
+        for specimen in selected_to_cross:
+            self.population.remove(specimen)
+
+        for specimen in range(0, len(selected_to_cross), 2):
+            offspring_1, offspring_2 = self.crossover_specimens(selected_to_cross[specimen], selected_to_cross[specimen + 1])
+            self.population.append(offspring_1)
+            self.population.append(offspring_1)
 
 
     def crossover_specimens(self, mother, father):
         if len(mother.permutation) != len(father.permutation):
             raise ValueError("Permutation sizes mismatch!")
 
-        offspring_1, offspring_2 =  mother.permutation.copy(), father.permutation.copy()
+        offspring_1, offspring_2 = mother.permutation.copy(), father.permutation.copy()
+        print(offspring_1)
+        print(offspring_2)
         pivot = npr.randint(1, self.input_data.size - 1)
         offspring_1[:pivot] = father.permutation[:pivot]
-        offspring_2[pivot:] = mother.permutation[pivot:]
+        offspring_2[:pivot] = mother.permutation[:pivot]
+        print(offspring_1)
+        print(offspring_2)
         self.fix_locations(offspring_1)
         self.fix_locations(offspring_2)
         return [s.Specimen(self.input_data, offspring_1),
                 s.Specimen(self.input_data, offspring_2)]
+
+    def crossover_PMX(self, mother, father):
+            if len(mother.permutation) != len(father.permutation):
+                raise ValueError("Cannot crossover two subjects with different perm size")
+            cut_points = sorted(random.sample(range(1, len(mother.permutation)), 2))
+            off1, off2 = s.Specimen(self.input_data, mother.permutation), s.Specimen(self.input_data, father.permutation)
+            for i in range(cut_points[0], cut_points[1]):
+                off2.permutation[i] = mother.permutation[i]
+                off1.permutation[i] = father.permutation[i]
+            mapping = dict()
+            for i in [x for x in range(len(mother.permutation)) if x not in range(cut_points[0], cut_points[1])]:
+                mapping[i] = [mother.permutation[i], father.permutation[i]]
+            for i in mapping:
+                if mother.permutation[i] not in off1.permutation:
+                    off1.permutation[i] = mapping[i][0]
+                    off2.permutation[i] = mapping[i][1]
+                else:
+                    off1.permutation[i] = mapping[i][1]
+                    off2.permutation[i] = mapping[i][0]
+
+            # print(off1.permutation)
+            # print(off2.permutation)
+            # self.fix_locations(off1.permutation)
+            # self.fix_locations(off2.permutation)
+            return off1, off2
 
     def fix_locations(self, locations):
         number_of_occurrences = np.bincount(locations, minlength=self.input_data.size)
@@ -127,7 +161,7 @@ class Population:
         mutations = int(npr.binomial(self.population_size, self.mutation_probability))
         npr.choice(range(self.population_size), mutations, replace=False)
         for i in npr.choice(range(self.population_size), mutations, replace=False):
-            self.population[i] = self.population[i].mutation()
+            self.population[i] = self.population[i].mutation(self.mutation_probability)
 
 
 had12 = qap.QAP("had12.dat")
@@ -136,8 +170,15 @@ print(population.create_population())
 print(population.evaluate())
 
 permHad12_1 = [int(x) for x in "5,10,11,2,12,3,6,7,8,1,4,9".split(",")]
-permHad12_2 = [int(x) for x in "4,10,11,2,0,3,6,7,8,1,5,12".split(",")]
+permHad12_2 = [int(x) for x in "7,10,12,2,6,3,0,4,8,1,5,11".split(",")]
 child_1, child_2 = population.crossover_specimens(s.Specimen(population.input_data, permHad12_1),
                                      s.Specimen(population.input_data, permHad12_2))
 print(child_1.permutation, child_1.cost)
 print(child_2.permutation, child_2.cost)
+
+child_3, child_4 =population.crossover_PMX(s.Specimen(population.input_data, permHad12_1),
+                                     s.Specimen(population.input_data, permHad12_2))
+
+
+print(child_3.permutation, child_3.cost)
+print(child_4.permutation, child_4.cost)

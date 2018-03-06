@@ -8,6 +8,9 @@ class Specimen:
         self.permutation = permutation
         self.cost = utils.count_current_permutation_cost(input_data.D, input_data.F, permutation)
 
+    def __str__(self):
+        return self.permutation, self.cost
+
     #factor is selection provability
     def mutation(self, factor):
         random_indexes = np.random.choice(range(self.input_data.size),
