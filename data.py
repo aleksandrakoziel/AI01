@@ -1,4 +1,3 @@
-import numpy as np
 
 
 def read_data_from_file(file):

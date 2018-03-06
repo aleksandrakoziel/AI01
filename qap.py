@@ -29,15 +29,15 @@ class QAP:
 
     def greedy_algorithm(self):
 
-        localizations = set(range(0, self.size))
+        localizations = set(range(0, self.size)) # all factories
         best_cost = float("inf")
         best_permutation = list([])
 
         for a in localizations:
 
             permutation = list([])
-            current = a
-            next = 0
+            current = a # where am I now
+            next = 0 # where should I go
             localizations_to_visit = set(range(0, self.size))
 
             while localizations_to_visit != set([]):
