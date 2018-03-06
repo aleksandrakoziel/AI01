@@ -23,6 +23,7 @@ class Population:
         self.history = dict()
 
         self.cost_count = 0
+        self.current_best = None
 
 
     #create new population
@@ -42,6 +43,7 @@ class Population:
         population_of_generation = self.population
         sum_costs = sum(specimen.cost for specimen in population_of_generation)
         average_cost = sum_costs / len(population_of_generation)
+        self.current_best = min(population_of_generation, key=lambda specimen: specimen.cost)
 
         current_population_parameters = {"Total_population": population_of_generation,
                                          "Total_costs": sum_costs,
@@ -63,10 +65,12 @@ class Population:
 
         current_population = self.population
         max_cost = max(current_population, key=lambda specimen: specimen.cost)
+        current_population.remove(self.current_best)
         total_cost = sum(specimen.cost for specimen in current_population)
 
+
         probability_distribution = []
-        for specimen in self.population:
+        for specimen in current_population:
             probability_distribution.append((max_cost.cost - specimen.cost)/(total_cost))
 
 
@@ -74,11 +78,9 @@ class Population:
         probability_distribution[-1] = probability_distribution[-1] + 1 - summarize_probability
 
         to_crossover = np.random.choice(current_population,
-                                        int(self.population_size * self.crossover_probability),
-                                        replace=False,
+                                        int(self.population_size - 1),
+                                        replace=True,
                                         p=probability_distribution)
-        for x in to_crossover:
-            print(x.permutation)
 
         if len(to_crossover) % 2 != 0:
             if len(to_crossover) > 2:
@@ -93,8 +95,10 @@ class Population:
     def selection_by_ranking(self, generation=None):
         current = self.population
 
+        current.remove(self.current_best)
+
         ranking = sorted(current, key=lambda specimen: specimen.cost)
-        count_specimens = int(self.population_size * self.crossover_probability)
+        count_specimens = int(self.population_size - 1 * self.crossover_probability)
 
         if count_specimens % 2 != 0:
             if count_specimens > 2:
@@ -109,12 +113,16 @@ class Population:
     def crossover(self, selected_to_cross):
         for specimen in selected_to_cross:
             self.population.remove(specimen)
-
         for specimen in range(0, len(selected_to_cross), 2):
-            offspring_1, offspring_2 = self.crossover_specimens(selected_to_cross[specimen], selected_to_cross[specimen + 1])
-            self.population.append(offspring_1)
-            self.population.append(offspring_1)
-            self.cost_count += 2
+            if random.randint(0,100) < self.crossover_probability * 100:
+                offspring_1, offspring_2 = self.crossover_specimens(selected_to_cross[specimen], selected_to_cross[specimen + 1])
+                self.population.append(offspring_1)
+                self.population.append(offspring_1)
+                self.cost_count += 2
+            else:
+                self.population.append(selected_to_cross[specimen])
+                self.population.append(selected_to_cross[specimen + 1])
+        self.population.append(self.current_best)
 
 
     def crossover_specimens(self, mother, father):
@@ -132,7 +140,7 @@ class Population:
 
     def crossover_PMX(self, mother, father):
         if len(mother.permutation) != len(father.permutation):
-            raise ValueError("Cannot crossover two subjects with different perm size")
+            raise ValueError("Size mismatch!")
         cut_points = sorted(random.sample(range(1, len(mother.permutation)), 2))
 
         offspring_1, offspring_2 = s.Specimen(self.input_data, mother.permutation), s.Specimen(self.input_data, father.permutation)

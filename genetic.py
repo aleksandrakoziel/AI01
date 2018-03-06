@@ -15,9 +15,9 @@ class GeneticAlgorithm:
         self.method = method
 
     def __str__(self):
-        return "GENETIC ALGORITHM PARAMETERS \nPopulation size: " + str(self.population_size) + "\nCrossover probability: " + \
+        return "\nGENETIC ALGORITHM PARAMETERS \nPopulation size: " + str(self.population_size) + "\nCrossover probability: " + \
                str(self.crossover_probability) + "\nMutation probability: " + str(self.mutation_probability) + \
-               "\nGenerations: " + str(self.generations) + "\nSelection method: "
+               "\nGenerations: " + str(self.generations) + "\nSelection method: " + self.method
 
     def performGeneticAlgorithm(self):
         start_time = timer()
