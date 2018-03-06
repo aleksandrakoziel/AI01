@@ -137,26 +137,28 @@ class Population:
             if len(mother.permutation) != len(father.permutation):
                 raise ValueError("Cannot crossover two subjects with different perm size")
             cut_points = sorted(random.sample(range(1, len(mother.permutation)), 2))
-            off1, off2 = s.Specimen(self.input_data, mother.permutation), s.Specimen(self.input_data, father.permutation)
-            for i in range(cut_points[0], cut_points[1]):
-                off2.permutation[i] = mother.permutation[i]
-                off1.permutation[i] = father.permutation[i]
+
+            offspring_1, offspring_2 = s.Specimen(self.input_data, mother.permutation), s.Specimen(self.input_data, father.permutation)
+
+            for localisation in range(cut_points[0], cut_points[1]):
+                offspring_2.permutation[localisation] = mother.permutation[localisation]
+                offspring_1.permutation[localisation] = father.permutation[localisation]
+
             mapping = dict()
             for i in [x for x in range(len(mother.permutation)) if x not in range(cut_points[0], cut_points[1])]:
                 mapping[i] = [mother.permutation[i], father.permutation[i]]
-            for i in mapping:
-                if mother.permutation[i] not in off1.permutation:
-                    off1.permutation[i] = mapping[i][0]
-                    off2.permutation[i] = mapping[i][1]
-                else:
-                    off1.permutation[i] = mapping[i][1]
-                    off2.permutation[i] = mapping[i][0]
 
-            # print(off1.permutation)
-            # print(off2.permutation)
-            # self.fix_locations(off1.permutation)
-            # self.fix_locations(off2.permutation)
-            return off1, off2
+            for i in mapping:
+                if mother.permutation[i] not in offspring_1.permutation:
+                    offspring_1.permutation[i] = mapping[i][0]
+                else:
+                    offspring_1.permutation[i] = mapping[i][1]
+                if mother.permutation[i] not in offspring_2.permutation:
+                    offspring_2.permutation[i] = mapping[i][0]
+                else:
+                    offspring_2.permutation[i] = mapping[i][1]
+
+            return offspring_1, offspring_2
 
     def fix_locations(self, locations):
         number_of_occurrences = np.bincount(locations, minlength=self.input_data.size)

@@ -49,7 +49,7 @@ genetic2 = GeneticAlgorithm(100, had12, 200, 0.1, 0.05)
 best = genetic2.performGeneticAlgorithm("ranking")
 print("Best: ", best.permutation, best.cost)
 
-genetic3 = GeneticAlgorithm(2000, had12, 800, 0.7, 0.01)
+genetic3 = GeneticAlgorithm(2000, had12, 800, 0.5, 0.01)
 best = genetic3.performGeneticAlgorithm("ranking")
 print("Best: ", best.permutation, best.cost)
 
