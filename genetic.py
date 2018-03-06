@@ -11,6 +11,12 @@ class GeneticAlgorithm:
         self.population_size = population_size
         self.crossover_probability = crossover_probability
         self.mutation_probability = mutation_probability
+        self.fitness = 0.0
+
+    def __str__(self):
+        return "Population size: " + str(self.population_size) + "\nCrossover probability: " + \
+               str(self.crossover_probability) + "\nMutation probability: " + str(self.mutation_probability) + \
+               "\nGenerations: " + str(self.generations)
 
     def performGeneticAlgorithm(self, method):
         start_time = timer()
@@ -30,6 +36,8 @@ class GeneticAlgorithm:
         logging.info("Total time: ", time)
         print("Total time: ", time)
         logging.info("Total number of cost count: ", population.cost_count)
+
+        self.fitness = population.cost_count / time
         return population.best_specimen
 
     def selection_method(self, method, population, generation):
@@ -39,20 +47,3 @@ class GeneticAlgorithm:
             return population.selection_by_ranking(generation)
 
 
-
-had12 = qap.QAP("had12.dat")
-genetic = GeneticAlgorithm(10, had12, 20, 0.1, 0.05)
-best = genetic.performGeneticAlgorithm("ranking")
-print("Best: ", best.permutation, best.cost)
-
-genetic2 = GeneticAlgorithm(100, had12, 200, 0.1, 0.05)
-best = genetic2.performGeneticAlgorithm("ranking")
-print("Best: ", best.permutation, best.cost)
-
-genetic3 = GeneticAlgorithm(2000, had12, 800, 0.5, 0.01)
-best = genetic3.performGeneticAlgorithm("ranking")
-print("Best: ", best.permutation, best.cost)
-
-# genetic3 = GeneticAlgorithm(2000, had12, 500, 0.1, 0.05)
-# best = genetic3.performGeneticAlgorithm("ranking")
-# print("Best: ", best.permutation, best.cost)

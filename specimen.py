@@ -9,10 +9,9 @@ class Specimen:
         self.cost = utils.count_current_permutation_cost(input_data.D, input_data.F, permutation)
 
     def __str__(self):
-        return self.permutation, self.cost
+        return str(self.permutation) + str(self.cost)
 
-    #factor is selection probability
-    def mutation(self, factor):
+    def mutation(self, probability_mutation):
         random_indexes = random.sample(range(1, len(self.permutation)), 2)
         mutated_locations = self.permutation.copy()
         swap = mutated_locations[random_indexes[0]]

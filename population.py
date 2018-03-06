@@ -114,6 +114,7 @@ class Population:
             offspring_1, offspring_2 = self.crossover_specimens(selected_to_cross[specimen], selected_to_cross[specimen + 1])
             self.population.append(offspring_1)
             self.population.append(offspring_1)
+            self.cost_count += 2
 
 
     def crossover_specimens(self, mother, father):
@@ -121,13 +122,9 @@ class Population:
             raise ValueError("Permutation sizes mismatch!")
 
         offspring_1, offspring_2 = mother.permutation.copy(), father.permutation.copy()
-        print(offspring_1)
-        print(offspring_2)
         pivot = npr.randint(1, self.input_data.size - 1)
         offspring_1[:pivot] = father.permutation[:pivot]
         offspring_2[:pivot] = mother.permutation[:pivot]
-        print(offspring_1)
-        print(offspring_2)
         self.fix_locations(offspring_1)
         self.fix_locations(offspring_2)
         return [s.Specimen(self.input_data, offspring_1),
@@ -173,6 +170,7 @@ class Population:
         npr.choice(range(self.population_size), mutations, replace=False)
         for i in npr.choice(range(self.population_size), mutations, replace=False):
             self.population[i] = self.population[i].mutation(self.mutation_probability)
+            self.cost_count += 1
 
 
 had12 = qap.QAP("had12.dat")
@@ -187,7 +185,7 @@ child_1, child_2 = population.crossover_specimens(s.Specimen(population.input_da
 print(child_1.permutation, child_1.cost)
 print(child_2.permutation, child_2.cost)
 
-child_3, child_4 =population.crossover_PMX(s.Specimen(population.input_data, permHad12_1),
+child_3, child_4 = population.crossover_PMX(s.Specimen(population.input_data, permHad12_1),
                                      s.Specimen(population.input_data, permHad12_2))
 
 
